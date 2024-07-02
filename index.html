@@ -6,62 +6,21 @@
   <script src="https://cdn.jsdelivr.net/gh/AR-js-org/AR.js@3.3.2/aframe/build/aframe-ar-nft.js"></script>
 </head>
 <body style="margin: 0; overflow: hidden;">
-  <a-scene vr-mode-ui="enabled: false;" embedded arjs="sourceType: webcam; debugUIEnabled: false;">
+  <a-scene embedded arjs="sourceType: webcam; debugUIEnabled: false;">
     <a-assets>
       <a-asset-item id="cpu-model" src="cpu-model.glb"></a-asset-item>
     </a-assets>
 
     <!-- Markerless Entity -->
+    <a-entity gltf-model="#cpu-model" scale="0.5 0.5 0.5" position="0 0 -2"></a-entity>
+
+    <!-- Camera -->
     <a-entity camera></a-entity>
-    <a-entity 
-      gltf-model="#cpu-model" 
-      scale="0.5 0.5 0.5" 
-      position="0 0 -2" 
-      rotation="0 0 0"
-      gesture-handler>
-    </a-entity>
   </a-scene>
 
   <!-- Attribution -->
   <div style="position: absolute; bottom: 10px; width: 100%; text-align: center; color: white;">
     <small>3D Model by [Creator's Name] on <a href="https://sketchfab.com/models/12345">Sketchfab</a></small>
   </div>
-
-  <!-- Gesture Handler Script -->
-  <script>
-    AFRAME.registerComponent('gesture-handler', {
-      schema: {
-        enabled: { default: true },
-      },
-      init: function () {
-        this.handleScale = this.handleScale.bind(this);
-        this.handleRotation = this.handleRotation.bind(this);
-        this.el.sceneEl.addEventListener('touchstart', this.handleScale);
-        this.el.sceneEl.addEventListener('touchmove', this.handleRotation);
-      },
-      remove: function () {
-        this.el.sceneEl.removeEventListener('touchstart', this.handleScale);
-        this.el.sceneEl.removeEventListener('touchmove', this.handleRotation);
-      },
-      handleScale: function (event) {
-        if (event.touches.length == 2) {
-          let d = Math.sqrt(Math.pow(event.touches[0].clientX - event.touches[1].clientX, 2) + Math.pow(event.touches[0].clientY - event.touches[1].clientY, 2));
-          if (this.lastDistance) {
-            let scale = this.el.object3D.scale;
-            let newScale = (scale.x * d / this.lastDistance);
-            this.el.object3D.scale.set(newScale, newScale, newScale);
-          }
-          this.lastDistance = d;
-        }
-      },
-      handleRotation: function (event) {
-        if (event.touches.length == 1) {
-          let rotation = this.el.object3D.rotation;
-          rotation.y += event.touches[0].clientX / window.innerWidth;
-          this.el.object3D.rotation.set(rotation.x, rotation.y, rotation.z);
-        }
-      }
-    });
-  </script>
 </body>
 </html>

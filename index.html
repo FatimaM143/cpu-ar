@@ -3,17 +3,56 @@
   <head>
     <title>CPU AR Experience</title>
     <script src="https://aframe.io/releases/1.2.0/aframe.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/gh/jeromeetienne/AR.js@2.1.8/aframe/build/aframe-ar.js"></script>
+    <script src="https://cdn.jsdelivr.net/gh/AR-js-org/AR.js@3.3.2/aframe/build/aframe-ar-nft.js"></script>
   </head>
   <body style="margin: 0; overflow: hidden;">
-    <a-scene embedded arjs>
+    <a-scene embedded arjs="sourceType: webcam; debugUIEnabled: false;">
       <a-assets>
         <a-asset-item id="cpu-model" src="cpu-model.glb"></a-asset-item>
       </a-assets>
-      <a-marker preset="hiro">
-        <a-entity gltf-model="#cpu-model" scale="0.5 0.5 0.5" position="0 0 0" rotation="0 0 0"></a-entity>
-      </a-marker>
+
+      <!-- Markerless Entity -->
       <a-entity camera></a-entity>
+      <a-entity 
+        gltf-model="#cpu-model" 
+        scale="0.5 0.5 0.5" 
+        position="0 0 -5" 
+        rotation="0 0 0"
+        gesture-handler>
+      </a-entity>
     </a-scene>
+
+    <!-- Attribution -->
+    <div style="position: absolute; bottom: 10px; width: 100%; text-align: center; color: white;">
+      <small>3D Model by [Creator's Name] on <a href="https://sketchfab.com/models/12345">Sketchfab</a></small>
+    </div>
+
+    <!-- Gesture Handler Script -->
+    <script>
+      AFRAME.registerComponent('gesture-handler', {
+        init: function () {
+          var el = this.el;
+          this.handleRotation = this.handleRotation.bind(this);
+          this.handleScale = this.handleScale.bind(this);
+          el.addEventListener('rotatestart', this.handleRotation);
+          el.addEventListener('rotatemove', this.handleRotation);
+          el.addEventListener('pinchstart', this.handleScale);
+          el.addEventListener('pinchmove', this.handleScale);
+        },
+        remove: function () {
+          var el = this.el;
+          el.removeEventListener('rotatestart', this.handleRotation);
+          el.removeEventListener('rotatemove', this.handleRotation);
+          el.removeEventListener('pinchstart', this.handleScale);
+          el.removeEventListener('pinchmove', this.handleScale);
+        },
+        handleRotation: function (event) {
+          this.el.object3D.rotation.y += event.detail.rotation;
+        },
+        handleScale: function (event) {
+          this.el.object3D.scale.set(event.detail.scale, event.detail.scale, event.detail.scale);
+        }
+      });
+    </script>
   </body>
 </html>

@@ -29,7 +29,7 @@
     <small>3D Model by [Creator's Name] on <a href="https://sketchfab.com/models/12345">Sketchfab</a></small>
   </div>
 
-  <!-- Improved Gesture Handler Script -->
+  <!-- Simplified Gesture Handler Script -->
   <script>
     AFRAME.registerComponent('gesture-handler', {
       schema: {
@@ -37,7 +37,6 @@
       },
       init: function () {
         this.initialScale = this.el.object3D.scale.clone();
-        this.initialRotation = this.el.object3D.rotation.clone();
         this.pinchStartDistance = null;
         this.lastTouchPositions = [];
 
@@ -64,8 +63,8 @@
         } else if (event.touches.length === 1) {
           const deltaX = event.touches[0].clientX - this.lastTouchPositions[0].x;
           const deltaY = event.touches[0].clientY - this.lastTouchPositions[0].y;
-          this.el.object3D.rotation.y += deltaX * 0.01;
-          this.el.object3D.rotation.x -= deltaY * 0.01;
+          this.el.object3D.rotation.y += deltaX * 0.005;
+          this.el.object3D.rotation.x -= deltaY * 0.005;
           this.lastTouchPositions = Array.from(event.touches).map(touch => ({ x: touch.clientX, y: touch.clientY }));
         }
       },

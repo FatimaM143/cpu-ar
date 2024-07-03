@@ -16,7 +16,7 @@
       gltf-model="#cpu-model" 
       scale="0.2 0.2 0.2" 
       position="0 0 -3" 
-      rotation="0 45 0"
+      rotation="0 0 0"
       gesture-handler>
     </a-entity>
 
@@ -29,39 +29,56 @@
     <small>3D Model by [Creator's Name] on <a href="https://sketchfab.com/models/12345">Sketchfab</a></small>
   </div>
 
-  <!-- Gesture Handler Script -->
+  <!-- Improved Gesture Handler Script -->
   <script>
     AFRAME.registerComponent('gesture-handler', {
       schema: {
         enabled: { default: true },
       },
       init: function () {
-        this.handleScale = this.handleScale.bind(this);
-        this.handleRotation = this.handleRotation.bind(this);
-        this.el.sceneEl.addEventListener('touchstart', this.handleScale);
-        this.el.sceneEl.addEventListener('touchmove', this.handleRotation);
+        this.initialScale = this.el.object3D.scale.clone();
+        this.initialRotation = this.el.object3D.rotation.clone();
+        this.pinchStartDistance = null;
+        this.lastTouchPositions = [];
+
+        this.el.sceneEl.addEventListener('touchstart', this.onTouchStart.bind(this));
+        this.el.sceneEl.addEventListener('touchmove', this.onTouchMove.bind(this));
+        this.el.sceneEl.addEventListener('touchend', this.onTouchEnd.bind(this));
       },
-      remove: function () {
-        this.el.sceneEl.removeEventListener('touchstart', this.handleScale);
-        this.el.sceneEl.removeEventListener('touchmove', this.handleRotation);
+      onTouchStart: function (event) {
+        if (event.touches.length === 2) {
+          this.pinchStartDistance = this.getPinchDistance(event.touches);
+          this.initialScale = this.el.object3D.scale.clone();
+        }
+        this.lastTouchPositions = Array.from(event.touches).map(touch => ({ x: touch.clientX, y: touch.clientY }));
       },
-      handleScale: function (event) {
-        if (event.touches.length == 2) {
-          let d = Math.sqrt(Math.pow(event.touches[0].clientX - event.touches[1].clientX, 2) + Math.pow(event.touches[0].clientY - event.touches[1].clientY, 2));
-          if (this.lastDistance) {
-            let scale = this.el.object3D.scale;
-            let newScale = (scale.x * d / this.lastDistance);
-            this.el.object3D.scale.set(newScale, newScale, newScale);
-          }
-          this.lastDistance = d;
+      onTouchMove: function (event) {
+        if (event.touches.length === 2 && this.pinchStartDistance) {
+          const pinchDistance = this.getPinchDistance(event.touches);
+          const scaleChange = pinchDistance / this.pinchStartDistance;
+          this.el.object3D.scale.set(
+            this.initialScale.x * scaleChange,
+            this.initialScale.y * scaleChange,
+            this.initialScale.z * scaleChange
+          );
+        } else if (event.touches.length === 1) {
+          const deltaX = event.touches[0].clientX - this.lastTouchPositions[0].x;
+          const deltaY = event.touches[0].clientY - this.lastTouchPositions[0].y;
+          this.el.object3D.rotation.y += deltaX * 0.01;
+          this.el.object3D.rotation.x -= deltaY * 0.01;
+          this.lastTouchPositions = Array.from(event.touches).map(touch => ({ x: touch.clientX, y: touch.clientY }));
         }
       },
-      handleRotation: function (event) {
-        if (event.touches.length == 1) {
-          let rotation = this.el.object3D.rotation;
-          rotation.y += event.touches[0].clientX / window.innerWidth * 2 * Math.PI;
-          this.el.object3D.rotation.set(rotation.x, rotation.y, rotation.z);
+      onTouchEnd: function (event) {
+        if (event.touches.length < 2) {
+          this.pinchStartDistance = null;
         }
+        this.lastTouchPositions = Array.from(event.touches).map(touch => ({ x: touch.clientX, y: touch.clientY }));
+      },
+      getPinchDistance: function (touches) {
+        const dx = touches[0].clientX - touches[1].clientX;
+        const dy = touches[0].clientY - touches[1].clientY;
+        return Math.sqrt(dx * dx + dy * dy);
       }
     });
   </script>

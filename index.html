@@ -12,11 +12,13 @@
     </a-assets>
 
     <!-- Ambient Light to provide general illumination -->
-    <a-light type="ambient" color="#ffffff"></a-light>
+    <a-light type="ambient" color="#ffffff" intensity="0.5"></a-light>
 
-    <!-- Directional Light to highlight details -->
-    <a-light type="directional" position="-1 2 1" intensity="0.8"></a-light>
-    <a-light type="directional" position="1 2 -1" intensity="0.8"></a-light>
+    <!-- Directional Lights to highlight details -->
+    <a-light type="directional" color="#ffffff" intensity="0.8" position="-1 2 1"></a-light>
+    <a-light type="directional" color="#ffffff" intensity="0.8" position="1 2 -1"></a-light>
+    <a-light type="point" color="#ffffff" intensity="1.0" position="0 2 2"></a-light>
+    <a-light type="point" color="#ffffff" intensity="1.0" position="0 -2 2"></a-light>
 
     <!-- Adjusted Position and Scale for the Model -->
     <a-entity 

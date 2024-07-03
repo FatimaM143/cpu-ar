@@ -11,6 +11,13 @@
       <a-asset-item id="cpu-model" src="cpu-model.glb"></a-asset-item>
     </a-assets>
 
+    <!-- Ambient Light to provide general illumination -->
+    <a-light type="ambient" color="#ffffff"></a-light>
+
+    <!-- Directional Light to highlight details -->
+    <a-light type="directional" position="-1 2 1" intensity="0.8"></a-light>
+    <a-light type="directional" position="1 2 -1" intensity="0.8"></a-light>
+
     <!-- Adjusted Position and Scale for the Model -->
     <a-entity 
       gltf-model="#cpu-model" 
@@ -23,6 +30,11 @@
     <!-- Camera -->
     <a-entity camera></a-entity>
   </a-scene>
+
+  <!-- Attribution -->
+  <div style="position: absolute; bottom: 10px; width: 100%; text-align: center; color: white;">
+    <small>3D Model by [Creator's Name] on <a href="https://sketchfab.com/models/12345">Sketchfab</a></small>
+  </div>
 
   <!-- Simplified Gesture Handler Script -->
   <script>

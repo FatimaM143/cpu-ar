@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Markerless AR Experience</title>
+  <title>High-Quality AR Experience</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <script src="https://aframe.io/releases/1.2.0/aframe.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/aframe-xr@1.0.0/dist/aframe-xr.min.js"></script>
@@ -21,11 +21,18 @@
 </head>
 <body>
   <button id="startButton">Start AR</button>
-  <a-scene vr-mode-ui="enabled: false" embedded arjs>
+  <a-scene vr-mode-ui="enabled: false" embedded arjs renderer="antialias: true; colorManagement: true; physicallyCorrectLights: true; shadowMap: true;">
     <a-assets>
       <a-asset-item id="cpu-model" src="cpu-model.glb"></a-asset-item>
     </a-assets>
-    
+
+    <!-- Ambient Light to provide general illumination -->
+    <a-light type="ambient" color="#ffffff" intensity="0.5"></a-light>
+
+    <!-- Directional Lights to highlight details -->
+    <a-light type="directional" color="#ffffff" intensity="1" position="-1 2 1"></a-light>
+    <a-light type="directional" color="#ffffff" intensity="1" position="1 2 -1"></a-light>
+
     <!-- The invisible plane used to place the model -->
     <a-entity id="hit-test-container" visible="false">
       <a-entity id="hit-test" position="0 0 0"></a-entity>
@@ -37,7 +44,8 @@
       scale="0.2 0.2 0.2" 
       position="0 0 -3" 
       visible="false"
-      id="model">
+      id="model"
+      shadow="cast: true; receive: true;">
     </a-entity>
 
     <!-- Camera -->
@@ -59,13 +67,13 @@
         const scene = this.el.sceneEl;
         let xrSession = null;
         let xrHitTestSource = null;
-        
+
         this.el.sceneEl.addEventListener('enter-vr', async function () {
           xrSession = scene.renderer.xr.getSession();
-          
+
           const viewerReferenceSpace = await xrSession.requestReferenceSpace('viewer');
           xrHitTestSource = await xrSession.requestHitTestSource({ space: viewerReferenceSpace });
-          
+
           const frameOfReference = await xrSession.requestReferenceSpace('local');
           xrSession.requestAnimationFrame(function onXRFrame(time, frame) {
             let xrViewerPose = frame.getViewerPose(frameOfReference);
@@ -74,14 +82,14 @@
               if (hitTestResults.length > 0) {
                 let hit = hitTestResults[0];
                 let pose = hit.getPose(frameOfReference);
-                
+
                 hitTestContainer.object3D.position.copy(pose.transform.position);
                 hitTestContainer.object3D.visible = true;
-                
+
                 if (model.getAttribute('visible') === 'false') {
                   model.setAttribute('visible', 'true');
                 }
-                
+
                 model.object3D.position.copy(pose.transform.position);
                 model.object3D.quaternion.copy(pose.transform.orientation);
               }
